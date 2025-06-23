@@ -14,22 +14,44 @@ type Props = {
   params: Promise<Params>;
 };
 
-// Generate static params (equivalent to getStaticPaths)
+// Preload all character data during build
+const getAllCharacters = (): Record<string, Character> => {
+  const charactersDir = path.join(process.cwd(), "data/nightfarers");
+  const filenames = fs.readdirSync(charactersDir).filter((f) => f.endsWith(".json"));
+  const characters: Record<string, Character> = {};
+
+  for (const filename of filenames) {
+    try {
+      const filePath = path.join(charactersDir, filename);
+      const fileContents = fs.readFileSync(filePath, "utf8");
+      const character = JSON.parse(fileContents) as Character;
+      if (character.name) {
+        characters[filename.replace(".json", "")] = character;
+      } else {
+        console.warn(`Invalid character data in ${filename}, skipping.`);
+      }
+    } catch (error) {
+      console.error(`Error reading ${filename}:`, error);
+    }
+  }
+
+  return characters;
+};
+
+// Generate static params
 export async function generateStaticParams() {
   const charactersDir = path.join(process.cwd(), "data/nightfarers");
-  const filenames = fs.readdirSync(charactersDir);
+  const filenames = fs.readdirSync(charactersDir).filter((f) => f.endsWith(".json"));
   return filenames.map((filename) => ({
     nightfarerName: filename.replace(".json", ""),
   }));
-}
+};
 
 // Server Component
 export default async function CharacterPage({ params }: Props) {
-  // Safely access nightfarerName with fallback
   const data = await params;
   const nightfarerName = data?.nightfarerName;
   if (!nightfarerName) {
-    console.error("Error: nightfarerName is missing in params");
     return (
       <div>
         <h1>Error</h1>
@@ -38,19 +60,11 @@ export default async function CharacterPage({ params }: Props) {
     );
   }
 
-  const filePath = path.join(
-    process.cwd(),
-    "data/nightfarers",
-    `${nightfarerName}.json`
-  );
+  // Get preloaded character data
+  const characters = getAllCharacters();
+  const character = characters[nightfarerName];
 
-  // Read and parse JSON file
-  let character: Character;
-  try {
-    const fileContents = fs.readFileSync(filePath, "utf8");
-    character = JSON.parse(fileContents);
-  } catch (error) {
-    console.error(`Error reading file for ${nightfarerName}:`, error);
+  if (!character) {
     return (
       <div>
         <h1>Error</h1>
@@ -67,12 +81,13 @@ export default async function CharacterPage({ params }: Props) {
       <div className="flex gap-4 flex-col md:flex-row">
         <div className="w-full flex flex-col items-center">
           <h1>{character.name}</h1>
-          {/* <Image
+          <Image
             src={`/img/${nightfarerName}/sprite.png`}
             alt={character.name}
             width={250}
             height={250}
-          /> */}
+          />
+          
         </div>
         <div className="w-full">
           <h2>Abilities</h2>
@@ -91,9 +106,7 @@ export default async function CharacterPage({ params }: Props) {
                   <p className="w-full">{ability.description}</p>
                 </>
               ),
-              content: ability.note ? (
-                <SafeHTML html={ability.note} />
-              ) : null,
+              content: ability.note ? <SafeHTML html={ability.note} /> : null,
             }))}
           />
         </div>
@@ -106,16 +119,11 @@ export default async function CharacterPage({ params }: Props) {
             content: (
               <DataTable
                 isColumnWidthEqual={true}
-                header={[
-                  "",
-                  ...character.stat_array.map((stat) => stat.toUpperCase()),
-                ]}
+                header={["", ...character.stat_array.map((stat) => stat.toUpperCase())]}
                 body={[
                   scalingArray,
                   ...character.stat.map((stat, index) =>
-                    ["Level " + (index + 1), ...stat].map((value) =>
-                      value.toString()
-                    )
+                    ["Level " + (index + 1), ...stat].map((value) => value.toString())
                   ),
                 ]}
               />

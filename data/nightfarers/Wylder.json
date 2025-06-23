@@ -4,7 +4,7 @@
         {
             "name": "Sixth Sense",
             "description": "Cheat death a single time.",
-            "note": "<p>Revives with <strong>50% health</strong>.</p><ul><li>Cooldown: 60s</li><li>Passive effect</li></ul><span style=\"color: blue;\">Blue text</span>"
+            "note": "<p>Auto dodge <strong>1 lethal attack</strong>.</p> <p>Refrash at Site of Grace, but NOT with Wending Grace or teammates' revives.</p> <p>Will not dodge status effects.</p>"
         },
         {
             "name": "Claw Shot",
