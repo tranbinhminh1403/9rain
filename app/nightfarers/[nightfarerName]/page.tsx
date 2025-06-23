@@ -17,7 +17,8 @@ type Props = {
 // Preload all character data during build
 const getAllCharacters = (): Record<string, Character> => {
   const charactersDir = path.join(process.cwd(), "data/nightfarers");
-  const filenames = fs.readdirSync(charactersDir).filter((f) => f.endsWith(".json"));
+  const filenames = fs.readdirSync(charactersDir).filter((f) => f.endsWith(".json")).map((f) => f.toLowerCase());
+  console.log(filenames);
   const characters: Record<string, Character> = {};
 
   for (const filename of filenames) {
@@ -87,7 +88,7 @@ export default async function CharacterPage({ params }: Props) {
             width={250}
             height={250}
           />
-          
+
         </div>
         <div className="w-full">
           <h2>Abilities</h2>
