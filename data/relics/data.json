@@ -1,0 +1,60 @@
+{
+    "stat": {
+        "vigor": {
+            "desc": "Vigor +",
+            "number": 3,
+            "each": 20,
+            "affect": "HP",
+            "stackable": true
+        },
+        "mind": {
+            "desc": "Mind +",
+            "number": 3,
+            "each": 5,
+            "affect": "FP",
+            "stackable": true
+        },
+        "endurance": {
+            "desc": "Endurance +",
+            "number": 3,
+            "each": 2,
+            "affect": "Stamina",
+            "stackable": true
+        },
+        "strength": {
+            "desc": "Strength",
+            "number": 3,
+            "each": 1,
+            "affect": "Strength",
+            "stackable": true
+        },
+        "dexterity": {
+            "desc": "Dexterity",
+            "number": 3,
+            "each": 1,
+            "affect": "Dexterity",
+            "stackable": true
+        },
+        "intelligence": {
+            "desc": "Intelligence",
+            "number": 3,
+            "each": 1,
+            "affect": "Intelligence",
+            "stackable": true
+        },
+        "faith": {
+            "desc": "Faith",
+            "number": 3,
+            "each": 1,
+            "affect": "Faith",
+            "stackable": true
+        },
+        "arcane": {
+            "desc": "Arcane",
+            "number": 3,
+            "each": 1,
+            "affect": "Arcane",
+            "stackable": true
+        }
+    }
+}
