@@ -17,17 +17,19 @@ type Props = {
 // Preload all character data during build
 const getAllCharacters = (): Record<string, Character> => {
   const charactersDir = path.join(process.cwd(), "data/nightfarers");
-  const filenames = fs.readdirSync(charactersDir).filter((f) => f.endsWith(".json")).map((f) => f.toLowerCase());
-  console.log(filenames);
+  const filenames = fs.readdirSync(charactersDir).filter((f) => f.endsWith(".json"));
   const characters: Record<string, Character> = {};
 
+  console.log("Available files:", filenames); // Debug
   for (const filename of filenames) {
     try {
       const filePath = path.join(charactersDir, filename);
       const fileContents = fs.readFileSync(filePath, "utf8");
       const character = JSON.parse(fileContents) as Character;
       if (character.name) {
-        characters[filename.replace(".json", "")] = character;
+        const key = filename.replace(".json", "").toLowerCase(); // Normalize to lowercase
+        characters[key] = character;
+        console.log(`Loaded ${filename}:`, character.name); // Debug
       } else {
         console.warn(`Invalid character data in ${filename}, skipping.`);
       }
@@ -43,15 +45,16 @@ const getAllCharacters = (): Record<string, Character> => {
 export async function generateStaticParams() {
   const charactersDir = path.join(process.cwd(), "data/nightfarers");
   const filenames = fs.readdirSync(charactersDir).filter((f) => f.endsWith(".json"));
+  console.log("Generated params:", filenames.map((f) => f.replace(".json", "").toLowerCase())); // Debug
   return filenames.map((filename) => ({
-    nightfarerName: filename.replace(".json", ""),
+    nightfarerName: filename.replace(".json", "").toLowerCase(), // Lowercase URLs
   }));
 };
 
 // Server Component
 export default async function CharacterPage({ params }: Props) {
   const data = await params;
-  const nightfarerName = data?.nightfarerName;
+  const nightfarerName = data?.nightfarerName?.toLowerCase(); // Normalize to lowercase
   if (!nightfarerName) {
     return (
       <div>
@@ -66,6 +69,7 @@ export default async function CharacterPage({ params }: Props) {
   const character = characters[nightfarerName];
 
   if (!character) {
+    console.error(`Character not found: ${nightfarerName}`); // Debug
     return (
       <div>
         <h1>Error</h1>
@@ -83,12 +87,11 @@ export default async function CharacterPage({ params }: Props) {
         <div className="w-full flex flex-col items-center">
           <h1>{character.name}</h1>
           <Image
-            src={`/img/${nightfarerName}/sprite.png`}
+            src={`/img/${nightfarerName}/sprite.png`} // Adjust case if needed
             alt={character.name}
             width={250}
             height={250}
           />
-
         </div>
         <div className="w-full">
           <h2>Abilities</h2>
@@ -97,7 +100,7 @@ export default async function CharacterPage({ params }: Props) {
               triggerContent: (
                 <>
                   <Image
-                    src={`/img/${nightfarerName}/s${index + 1}.png`}
+                    src={`/img/${nightfarerName}/s${index + 1}.png`} // Adjust case if needed
                     alt={character.name}
                     width={50}
                     height={50}
